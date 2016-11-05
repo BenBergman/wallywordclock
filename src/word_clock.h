@@ -24,4 +24,4 @@ static const int leds_per_word[] = {
 };
 */
 
-bool* time_to_words(int hour, int minute);
+void time_to_words(bool *words, int hour, int minute);

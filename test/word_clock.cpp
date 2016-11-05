@@ -18,7 +18,9 @@ void words_list_equal(bool *words, bool *expected_words) {
 
 TEST(WordClock, FirstTest)
 {
-    bool *words = time_to_words(1, 2);
+    bool words[TOTAL_WORDS] = { false };
+    time_to_words(words, 1, 2);
+
     bool expected_words[TOTAL_WORDS] = { false };
     expected_words[IT] = true;
     expected_words[IS] = true;
@@ -27,5 +29,25 @@ TEST(WordClock, FirstTest)
     expected_words[IN] = true;
     expected_words[THE] = true;
     expected_words[MORNING] = true;
-    words_list_equal(words, expected_words);
+
+    MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
+}
+
+TEST(WordClock, AfternoonWithMinutes)
+{
+    bool words[TOTAL_WORDS] = { false };
+    time_to_words(words, 15, 15);
+
+    bool expected_words[TOTAL_WORDS] = { false };
+    expected_words[IT] = true;
+    expected_words[IS] = true;
+    expected_words[QUARTER] = true;
+    expected_words[PAST] = true;
+    expected_words[H_THREE] = true;
+    expected_words[PM] = true;
+    expected_words[IN] = true;
+    expected_words[THE] = true;
+    expected_words[AFTERNOON] = true;
+
+    MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
 }
