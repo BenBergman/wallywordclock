@@ -9,9 +9,11 @@ bool* time_to_words(int hour, int minute) {
     static bool words[TOTAL_WORDS] = {
         [IT] = true,
         [IS] = true,
-        //[OCLOCK] = true,
+        [H_ONE] = true,
+        [AM] = true,
+        [IN] = true,
+        [THE] = true,
+        [MORNING] = true,
     };
-    //static bool words[TOTAL_WORDS] = { false };
-    //words[IT] = words[IS] = words[OCLOCK] = true;
     return words;
 }
