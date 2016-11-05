@@ -71,3 +71,33 @@ TEST(WordClock, TwentyFiveToNineInTheEvening)
 
     MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
 }
+
+TEST(WordClock, NoonOclock)
+{
+    bool words[TOTAL_WORDS] = { false };
+    time_to_words(words, 12, 0);
+
+    bool expected_words[TOTAL_WORDS] = { false };
+    expected_words[IT] = true;
+    expected_words[IS] = true;
+    expected_words[NOON] = true;
+    expected_words[OCLOCK] = true;
+
+    MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
+}
+
+TEST(WordClock, TenToNoonOclock)
+{
+    bool words[TOTAL_WORDS] = { false };
+    time_to_words(words, 11, 53);
+
+    bool expected_words[TOTAL_WORDS] = { false };
+    expected_words[IT] = true;
+    expected_words[IS] = true;
+    expected_words[TEN] = true;
+    expected_words[TO] = true;
+    expected_words[NOON] = true;
+    expected_words[OCLOCK] = true;
+
+    MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
+}

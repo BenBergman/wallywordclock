@@ -3,7 +3,7 @@
 #include "word_clock.h"
 
 void time_to_words(bool *words, int hour, int minute) {
-    int hour_word = H_ONE -1 + hour % 12;
+    int hour_word = H_ONE + ((hour - 1) % 12);
     int period = hour < 12 ? AM : PM;
 
     words[IT] = true;
@@ -47,15 +47,20 @@ void time_to_words(bool *words, int hour, int minute) {
     if (words[TO]) {
         hour_word += 1;
     }
-    words[hour_word] = true;
-    words[period] = true;
-    words[IN] = true;
-    words[THE] = true;
-    if (hour >= 0 && hour < 12) {
-        words[MORNING] = true;
-    } else if (hour >= 12 && hour < 18) {
-        words[AFTERNOON] = true;
-    } else if (hour >= 18) {
-        words[EVENING] = true;
+    if (hour_word == NOON) {
+        words[NOON] = true;
+        words[OCLOCK] = true;
+    } else {
+        words[hour_word] = true;
+        words[period] = true;
+        words[IN] = true;
+        words[THE] = true;
+        if (hour >= 0 && hour < 12) {
+            words[MORNING] = true;
+        } else if (hour >= 12 && hour < 18) {
+            words[AFTERNOON] = true;
+        } else if (hour >= 18) {
+            words[EVENING] = true;
+        }
     }
 }
