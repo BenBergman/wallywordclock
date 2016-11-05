@@ -15,11 +15,4 @@ static const int leds_per_word[] = {
     [OCLOCK] = 3,
 };
 
-bool* time_to_words(int hour, int minute) {
-    hour = minute = 0;
-    minute = hour = 0;
-
-    static bool words[TOTAL_WORDS] = { false };
-    words[IT] = words[IS] = true;
-    return words;
-}
+bool* time_to_words(int hour, int minute);
