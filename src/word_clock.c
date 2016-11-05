@@ -17,6 +17,35 @@ void time_to_words(bool *words, int hour, int minute) {
     } else if (minute >= 15 && minute < 20) {
         words[QUARTER] = true;
         words[PAST] = true;
+    } else if (minute >= 20 && minute < 25) {
+        words[TWENTY] = true;
+        words[PAST] = true;
+    } else if (minute >= 25 && minute < 30) {
+        words[TWENTY] = true;
+        words[FIVE] = true;
+        words[PAST] = true;
+    } else if (minute >= 30 && minute < 35) {
+        words[HALF] = true;
+        words[PAST] = true;
+    } else if (minute >= 35 && minute < 40) {
+        words[TWENTY] = true;
+        words[FIVE] = true;
+        words[TO] = true;
+    } else if (minute >= 40 && minute < 45) {
+        words[TWENTY] = true;
+        words[TO] = true;
+    } else if (minute >= 45 && minute < 50) {
+        words[QUARTER] = true;
+        words[TO] = true;
+    } else if (minute >= 50 && minute < 55) {
+        words[TEN] = true;
+        words[TO] = true;
+    } else if (minute >= 55 && minute < 60) {
+        words[FIVE] = true;
+        words[TO] = true;
+    }
+    if (words[TO]) {
+        hour_word += 1;
     }
     words[hour_word] = true;
     words[period] = true;
