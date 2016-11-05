@@ -18,9 +18,10 @@ void words_list_equal(bool *words, bool *expected_words) {
 
 TEST(WordClock, FirstTest)
 {
-    CHECK_EQUAL(leds_per_word[IT], 1);
-
     bool *words = time_to_words(1, 2);
-    bool expected_words[] = {true, true, false, false};
+    bool expected_words[TOTAL_WORDS] = {
+        [IT] = true,
+        [IS] = true,
+    };
     words_list_equal(words, expected_words);
 }
