@@ -1,4 +1,5 @@
-#define TOTAL_LEDS 10
+#ifndef WORD_CLOCK_H
+#define WORD_CLOCK_H
 
 typedef enum {
     IT, IS,
@@ -15,13 +16,12 @@ typedef enum {
     TOTAL_WORDS
 } word;
 
-/*
-static const int leds_per_word[] = {
-    [IT] = 1,
-    [IS] = 1,
-    [NOON] = 2,
-    [OCLOCK] = 3,
-};
-*/
+typedef struct {
+    int *map;
+    int size;
+} led_map_t;
 
 void time_to_words(bool *words, int hour, int minute);
+void words_to_leds(led_map_t led_map, bool *leds, bool *words);
+
+#endif // WORD_CLOCK_H

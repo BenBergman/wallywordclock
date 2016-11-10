@@ -133,3 +133,53 @@ TEST(WordClock, QuarterToMidnight)
 
     MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
 }
+
+
+
+
+
+TEST(WordClock, BasicWordsToLedsConversion)
+{
+    bool words[TOTAL_WORDS] = { false };
+    words[IT] = true;
+    words[IS] = true;
+    words[QUARTER] = true;
+    words[TO] = true;
+    words[MIDNIGHT] = true;
+    words[OCLOCK] = true;
+
+    int master_led_map[] = {
+        IT, IS,
+        FIVE, TEN, QUARTER, TWENTY, HALF,
+        PAST, TO,
+        H_ONE, H_TWO, H_THREE, H_FOUR, H_FIVE, H_SIX, H_SEVEN, H_EIGHT, H_NINE, H_TEN, H_ELEVEN,
+        NOON, MIDNIGHT,
+        OCLOCK,
+        AM, PM,
+        IN, THE,
+        MORNING, AFTERNOON, EVENING,
+        HAPPY, BIRTHDAY,
+        GO, TO2, SLEEP,
+    };
+
+    led_map_t my_map;
+    my_map.map = master_led_map;
+    my_map.size = sizeof(master_led_map) / sizeof(master_led_map[0]);
+
+    bool *leds = new bool[my_map.size];
+    //leds = { false };
+    words_to_leds(my_map, leds, words);
+
+    bool *expected_leds = new bool[my_map.size];
+    //expected_leds = { false };
+    expected_leds[0] = expected_leds[1] = true;
+    expected_leds[4] = true;
+    expected_leds[8] = true;
+    expected_leds[21] = true;
+    expected_leds[22] = true;
+
+    MEMCMP_EQUAL(expected_leds, leds, sizeof(expected_leds));
+
+    delete[] leds;
+    delete[] expected_leds;
+}

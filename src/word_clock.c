@@ -1,8 +1,11 @@
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "word_clock.h"
 
-void time_to_words(bool *words, int hour, int minute) {
+
+void time_to_words(bool *words, int hour, int minute)
+{
     int hour_word = H_ONE + ((hour - 1) % 12);
     int period = hour < 12 ? AM : PM;
 
@@ -65,5 +68,13 @@ void time_to_words(bool *words, int hour, int minute) {
         } else if (hour >= 18) {
             words[EVENING] = true;
         }
+    }
+}
+
+
+void words_to_leds(led_map_t led_map, bool *leds, bool *words)
+{
+    for (int i = 0; i < led_map.size; i++) {
+        leds[i] = words[led_map.map[i]];
     }
 }
