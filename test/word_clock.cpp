@@ -167,16 +167,63 @@ TEST(WordClock, BasicWordsToLedsConversion)
     my_map.size = sizeof(master_led_map) / sizeof(master_led_map[0]);
 
     bool *leds = new bool[my_map.size];
-    //leds = { false };
     words_to_leds(my_map, leds, words);
 
     bool *expected_leds = new bool[my_map.size];
-    //expected_leds = { false };
     expected_leds[0] = expected_leds[1] = true;
     expected_leds[4] = true;
     expected_leds[8] = true;
     expected_leds[21] = true;
     expected_leds[22] = true;
+
+    MEMCMP_EQUAL(expected_leds, leds, sizeof(expected_leds));
+
+    delete[] leds;
+    delete[] expected_leds;
+}
+
+TEST(WordClock, WordsToLedsOutOfOrderWithMultipleLedsPerWord)
+{
+    bool words[TOTAL_WORDS] = { false };
+    words[IT] = true;
+    words[IS] = true;
+    words[HALF] = true;
+    words[PAST] = true;
+    words[H_FIVE] = true;
+    words[PM] = true;
+    words[IN] = true;
+    words[THE] = true;
+    words[AFTERNOON] = true;
+
+    int master_led_map[] = {
+        GO, TO2, SLEEP,
+        HAPPY, BIRTHDAY,
+        MORNING, MORNING, AFTERNOON, AFTERNOON, EVENING, EVENING,
+        IN, THE,
+        AM, PM,
+        OCLOCK,
+        NOON, MIDNIGHT,
+        H_ONE, H_TWO, H_THREE, H_FOUR, H_FIVE, H_SIX, H_SEVEN, H_EIGHT, H_NINE, H_TEN, H_ELEVEN,
+        PAST, TO,
+        FIVE, TEN, QUARTER, TWENTY, HALF,
+        IT, IS,
+    };
+
+    led_map_t my_map;
+    my_map.map = master_led_map;
+    my_map.size = sizeof(master_led_map) / sizeof(master_led_map[0]);
+
+    bool *leds = new bool[my_map.size];
+    words_to_leds(my_map, leds, words);
+
+    bool *expected_leds = new bool[my_map.size];
+    expected_leds[36] = expected_leds[37] = true;
+    expected_leds[35] = true;
+    expected_leds[29] = true;
+    expected_leds[22] = true;
+    expected_leds[14] = true;
+    expected_leds[11] = expected_leds[12] = true;
+    expected_leds[7] = expected_leds[8] = true;
 
     MEMCMP_EQUAL(expected_leds, leds, sizeof(expected_leds));
 
