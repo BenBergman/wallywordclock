@@ -82,10 +82,21 @@ void words_to_leds(led_map_t led_map, bool *leds, bool *words)
 
 void interpolate_frame_at_time(uint8_t leds[][3], bool *old_points, bool *new_points, int frame)
 {
-    frame = new_points[0] = frame;
+    uint8_t in_colour[] = {(uint8_t)frame, (uint8_t)frame, (uint8_t)frame};
+    uint8_t out_colour[] = {(uint8_t)(255-frame), (uint8_t)(255-frame), (uint8_t)(255-frame)};
     for (int i = 0; i < 4; i++) { // TODO 4?!
-        if (old_points[i]) {
-            leds[i][0] = leds[i][1] = leds[i][2] = 255;
+        if (old_points[i] && new_points[i]) {
+            for (int rgb = 0; rgb < 3; rgb++) {
+                leds[i][rgb] = 255;
+            }
+        } else if (old_points[i] && !new_points[i]) {
+            for (int rgb = 0; rgb < 3; rgb++) {
+                leds[i][rgb] = out_colour[rgb];
+            }
+        } else if (new_points[i] && !old_points[i]) {
+            for (int rgb = 0; rgb < 3; rgb++) {
+                leds[i][rgb] = in_colour[rgb];
+            }
         }
     }
 }
