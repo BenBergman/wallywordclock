@@ -230,3 +230,26 @@ TEST(WordClock, WordsToLedsOutOfOrderWithMultipleLedsPerWord)
     delete[] leds;
     delete[] expected_leds;
 }
+
+
+
+
+
+TEST(WordClock, BasicLedFade)
+{
+    bool old_leds[] = {true, true, false, false};
+    bool new_leds[] = {false, true, true, false};
+
+    uint8_t led_brightnesses[4][3] = {{0}};
+
+    interpolate_frame_at_time(led_brightnesses, old_leds, new_leds, 0);
+
+    uint8_t expected_led_brightnesses[4][3] = {
+        {255, 255, 255},
+        {255, 255, 255},
+        {0, 0, 0},
+        {0, 0, 0},
+    };
+
+    MEMCMP_EQUAL(expected_led_brightnesses, led_brightnesses, sizeof(led_brightnesses));
+}

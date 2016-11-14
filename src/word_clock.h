@@ -1,6 +1,8 @@
 #ifndef WORD_CLOCK_H
 #define WORD_CLOCK_H
 
+#include <stdint.h>
+
 typedef enum {
     IT, IS,
     FIVE, TEN, QUARTER, TWENTY, HALF,
@@ -23,5 +25,6 @@ typedef struct {
 
 void time_to_words(bool *words, int hour, int minute);
 void words_to_leds(led_map_t led_map, bool *leds, bool *words);
+void interpolate_frame_at_time(uint8_t leds[][3], bool *old_points, bool *new_points, int frame);
 
 #endif // WORD_CLOCK_H

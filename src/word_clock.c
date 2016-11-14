@@ -78,3 +78,14 @@ void words_to_leds(led_map_t led_map, bool *leds, bool *words)
         leds[i] = words[led_map.map[i]];
     }
 }
+
+
+void interpolate_frame_at_time(uint8_t leds[][3], bool *old_points, bool *new_points, int frame)
+{
+    frame = new_points[0] = frame;
+    for (int i = 0; i < 4; i++) { // TODO 4?!
+        if (old_points[i]) {
+            leds[i][0] = leds[i][1] = leds[i][2] = 255;
+        }
+    }
+}
