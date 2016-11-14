@@ -242,7 +242,8 @@ TEST(WordClock, BasicLedFade)
 
     uint8_t led_brightnesses[4][3] = {{0}};
 
-    interpolate_frame_at_time(led_brightnesses, old_leds, new_leds, 0);
+    uint8_t colour[] = {255, 255, 255};
+    interpolate_frame_at_time(led_brightnesses, old_leds, new_leds, 0, colour);
 
     uint8_t expected_led_brightnesses[4][3] = {
         {255, 255, 255},
@@ -261,7 +262,8 @@ TEST(WordClock, QuarterFrame)
 
     uint8_t led_brightnesses[4][3] = {{0}};
 
-    interpolate_frame_at_time(led_brightnesses, old_leds, new_leds, 63);
+    uint8_t colour[] = {255, 255, 255};
+    interpolate_frame_at_time(led_brightnesses, old_leds, new_leds, 63, colour);
 
     uint8_t expected_led_brightnesses[4][3] = {
         {192, 192, 192},
@@ -280,12 +282,33 @@ TEST(WordClock, EndFrame)
 
     uint8_t led_brightnesses[4][3] = {{0}};
 
-    interpolate_frame_at_time(led_brightnesses, old_leds, new_leds, 255);
+    uint8_t colour[] = {255, 255, 255};
+    interpolate_frame_at_time(led_brightnesses, old_leds, new_leds, 255, colour);
 
     uint8_t expected_led_brightnesses[4][3] = {
         {0, 0, 0},
         {255, 255, 255},
         {255, 255, 255},
+        {0, 0, 0},
+    };
+
+    MEMCMP_EQUAL(expected_led_brightnesses, led_brightnesses, sizeof(led_brightnesses));
+}
+
+TEST(WordClock, EndFrameWithTint)
+{
+    bool old_leds[] = {true, true, false, false};
+    bool new_leds[] = {false, true, true, false};
+
+    uint8_t led_brightnesses[4][3] = {{0}};
+
+    uint8_t colour[] = {0, 255, 127};
+    interpolate_frame_at_time(led_brightnesses, old_leds, new_leds, 255, colour);
+
+    uint8_t expected_led_brightnesses[4][3] = {
+        {0, 0, 0},
+        {0, 255, 127},
+        {0, 255, 127},
         {0, 0, 0},
     };
 

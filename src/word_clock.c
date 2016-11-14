@@ -80,14 +80,28 @@ void words_to_leds(led_map_t led_map, bool *leds, bool *words)
 }
 
 
-void interpolate_frame_at_time(uint8_t leds[][3], bool *old_points, bool *new_points, int frame)
+long scale(long x, long in_min, long in_max, long out_min, long out_max)
 {
-    uint8_t in_colour[] = {(uint8_t)frame, (uint8_t)frame, (uint8_t)frame};
-    uint8_t out_colour[] = {(uint8_t)(255-frame), (uint8_t)(255-frame), (uint8_t)(255-frame)};
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+
+void interpolate_frame_at_time(uint8_t leds[][3], bool *old_points, bool *new_points, int frame, uint8_t colour[3])
+{
+    uint8_t in_colour[] = {
+        (uint8_t)scale(colour[0], 0, 255, 0, frame),
+        (uint8_t)scale(colour[1], 0, 255, 0, frame),
+        (uint8_t)scale(colour[2], 0, 255, 0, frame)
+    };
+    uint8_t out_colour[] = {
+        (uint8_t)(255-frame),
+        (uint8_t)(255-frame),
+        (uint8_t)(255-frame)
+    };
     for (int i = 0; i < 4; i++) { // TODO 4?!
         if (old_points[i] && new_points[i]) {
             for (int rgb = 0; rgb < 3; rgb++) {
-                leds[i][rgb] = 255;
+                leds[i][rgb] = colour[rgb];
             }
         } else if (old_points[i] && !new_points[i]) {
             for (int rgb = 0; rgb < 3; rgb++) {
