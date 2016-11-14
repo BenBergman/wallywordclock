@@ -334,3 +334,26 @@ TEST(WordClock, StartFrameWithTint)
 
     MEMCMP_EQUAL(expected_led_brightnesses, led_brightnesses, sizeof(led_brightnesses));
 }
+
+TEST(WordClock, TransitionIgnoresLedsThatWereOrAreNotTrue)
+{
+    bool old_leds[] = {false, true, true, false};
+    bool new_leds[] = {false, false, true, true};
+
+    uint8_t led_brightnesses[4][3] = {{0}};
+    led_brightnesses[0][0] = 1;
+    led_brightnesses[0][1] = 2;
+    led_brightnesses[0][2] = 3;
+
+    uint8_t colour[] = {255, 255, 255};
+    interpolate_frame_at_time(led_brightnesses, old_leds, new_leds, 63, colour);
+
+    uint8_t expected_led_brightnesses[4][3] = {
+        {1, 2, 3},
+        {192, 192, 192},
+        {255, 255, 255},
+        {63, 63, 63},
+    };
+
+    MEMCMP_EQUAL(expected_led_brightnesses, led_brightnesses, sizeof(led_brightnesses));
+}
