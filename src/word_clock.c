@@ -94,9 +94,9 @@ void interpolate_frame_at_time(uint8_t leds[][3], bool *old_points, bool *new_po
         (uint8_t)scale(colour[2], 0, 255, 0, frame)
     };
     uint8_t out_colour[] = {
-        (uint8_t)(255-frame),
-        (uint8_t)(255-frame),
-        (uint8_t)(255-frame)
+        (uint8_t)scale(colour[0], 0, 255, 0, 255-frame),
+        (uint8_t)scale(colour[1], 0, 255, 0, 255-frame),
+        (uint8_t)scale(colour[2], 0, 255, 0, 255-frame)
     };
     for (int i = 0; i < 4; i++) { // TODO 4?!
         if (old_points[i] && new_points[i]) {
