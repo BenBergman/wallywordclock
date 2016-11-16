@@ -48,6 +48,31 @@ int mode = 0;
 
 
 
+#include "FastLED.h"
+
+FASTLED_USING_NAMESPACE
+
+#if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
+#warning "Requires FastLED 3.1 or later; check github for latest code."
+#endif
+
+#define LED_DATA_PIN    13
+//#define CLK_PIN   4
+#define LED_TYPE    WS2811
+#define COLOR_ORDER GRB
+#define NUM_LEDS    64
+CRGB leds[NUM_LEDS];
+
+#define BRIGHTNESS          96
+#define FRAMES_PER_SECOND  120
+
+uint8_t hue = 100;
+uint8_t saturation = 255;
+uint8_t value = 255;
+
+
+
+
 
 typedef enum {
     IT, IS,
@@ -78,11 +103,15 @@ void setup()  {
   pinMode(BUTTON_PIN, INPUT);
   digitalWrite(BUTTON_PIN, HIGH);
 
+  FastLED.addLeds<LED_TYPE, LED_DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip); // TODO: should this correction be changed when we have the final strip?
+  FastLED.setBrightness(BRIGHTNESS);
+
   Serial.println("T1479235073");
   Serial.println("Waiting for sync message");
 }
 
 unsigned long lastDisplayTime = 0;
+unsigned long lastLedTime = 0;
 
 void loop(){    
   if (Serial.available() > 1) { // wait for at least two characters
@@ -95,7 +124,7 @@ void loop(){
     }
   }
   if (timeStatus()!= timeNotSet) {
-      if (millis() - lastDisplayTime > 10000){
+      if (millis() - lastDisplayTime > 10000) {
           digitalClockDisplay();  
           lastDisplayTime = millis();
       }
@@ -103,6 +132,12 @@ void loop(){
 
   readModeButton();
   handleRotation();
+
+  leds[0] = CHSV(hue, saturation, value);
+  if (millis() - lastLedTime > 1000/FRAMES_PER_SECOND) {
+      FastLED.show();
+      lastLedTime = millis();
+  }
 }
 
 
@@ -182,13 +217,27 @@ void handleRotation()
                     // TODO: don't let time roll over into next day
                     break;
                 case SET_HUE:
-                    Serial.println("Set hue");
+                    hue += step;
+                    Serial.print("New hue: ");
+                    Serial.println(hue);
                     break;
                 case SET_SATURATION:
-                    Serial.println("Set saturation");
+                    if (step > 0) {
+                        saturation = qadd8(saturation, step);
+                    } else {
+                        saturation = qsub8(saturation, -1 * step);
+                    }
+                    Serial.print("New saturation: ");
+                    Serial.println(saturation);
                     break;
                 case SET_BRIGHTNESS:
-                    Serial.println("Set brightness");
+                    if (step > 0) {
+                        value = qadd8(value, step);
+                    } else {
+                        value = qsub8(value, -1 * step);
+                    }
+                    Serial.print("New value: ");
+                    Serial.println(value);
                     break;
             }
 
