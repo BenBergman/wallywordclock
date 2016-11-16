@@ -134,6 +134,41 @@ TEST(WordClock, QuarterToMidnight)
     MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
 }
 
+TEST(WordClock, QuarterPastMidnight)
+{
+    bool words[TOTAL_WORDS] = { false };
+    time_to_words(words, 0, 17);
+
+    bool expected_words[TOTAL_WORDS] = { false };
+    expected_words[IT] = true;
+    expected_words[IS] = true;
+    expected_words[QUARTER] = true;
+    expected_words[PAST] = true;
+    expected_words[MIDNIGHT] = true;
+    expected_words[OCLOCK] = true;
+
+    MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
+}
+
+TEST(WordClock, QuarterToOneAM)
+{
+    bool words[TOTAL_WORDS] = { false };
+    time_to_words(words, 0, 49);
+
+    bool expected_words[TOTAL_WORDS] = { false };
+    expected_words[IT] = true;
+    expected_words[IS] = true;
+    expected_words[QUARTER] = true;
+    expected_words[TO] = true;
+    expected_words[H_ONE] = true;
+    expected_words[AM] = true;
+    expected_words[IN] = true;
+    expected_words[THE] = true;
+    expected_words[MORNING] = true;
+
+    MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
+}
+
 
 
 

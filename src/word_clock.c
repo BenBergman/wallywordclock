@@ -53,7 +53,7 @@ void time_to_words(bool *words, int hour, int minute)
     if (hour_word == NOON && hour != 23) {
         words[NOON] = true;
         words[OCLOCK] = true;
-    } else if (hour_word == NOON || hour == 0) {
+    } else if (hour_word == NOON || (words[PAST] && hour == 0)) {
         words[MIDNIGHT] = true;
         words[OCLOCK] = true;
     } else {
