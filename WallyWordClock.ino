@@ -56,19 +56,21 @@ FASTLED_USING_NAMESPACE
 #warning "Requires FastLED 3.1 or later; check github for latest code."
 #endif
 
-#define LED_DATA_PIN    13
+#define LED_DATA_PIN    6
 //#define CLK_PIN   4
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
-#define NUM_LEDS    64
-CRGB leds[NUM_LEDS];
+#define NUM_LEDS    122
+CRGBArray<NUM_LEDS> leds;
 
-#define BRIGHTNESS          96
+#define BRIGHTNESS          255
 #define FRAMES_PER_SECOND  120
 
+#define FADE_RATE 1 // Smaller is slower
+
 uint8_t hue = 100;
-uint8_t saturation = 255;
-uint8_t value = 255;
+uint8_t saturation = 100;
+uint8_t value = 150;
 
 
 
@@ -86,14 +88,62 @@ typedef enum {
     MORNING, AFTERNOON, EVENING,
     HAPPY, BIRTHDAY,
     GO, TO2, SLEEP,
+    DOT,
     TOTAL_WORDS
 };
 
 
+int led_map[NUM_LEDS] = {
+    EVENING,EVENING,EVENING,EVENING,EVENING,
+    HAPPY,HAPPY,HAPPY,HAPPY,
+    BIRTHDAY,BIRTHDAY,BIRTHDAY,BIRTHDAY,BIRTHDAY,
+    DOT,
+    AFTERNOON,AFTERNOON,AFTERNOON,AFTERNOON,AFTERNOON,AFTERNOON,AFTERNOON,
+    SLEEP,SLEEP,SLEEP,
+    MORNING,MORNING,MORNING,MORNING,MORNING,MORNING,
+    OCLOCK,OCLOCK,OCLOCK,OCLOCK,OCLOCK,
+    AM,AM,AM,
+    PM,PM,PM,
+    IN,IN,
+    THE,THE,THE,
+    MIDNIGHT,MIDNIGHT,MIDNIGHT,MIDNIGHT,MIDNIGHT,MIDNIGHT,MIDNIGHT,
+    NOON,NOON,NOON,NOON,
+    H_ELEVEN,H_ELEVEN,H_ELEVEN,H_ELEVEN,H_ELEVEN,
+    H_SEVEN,H_SEVEN,H_SEVEN,H_SEVEN,
+    GO,GO,
+    TO2,
+    H_EIGHT,H_EIGHT,H_EIGHT,
+    H_NINE,H_NINE,
+    H_TEN,H_TEN,H_TEN,
+    H_SIX,H_SIX,H_SIX,
+    H_FIVE,H_FIVE,
+    H_FOUR,H_FOUR,H_FOUR,
+    H_THREE,H_THREE,H_THREE,H_THREE,
+    H_TWO,H_TWO,H_TWO,
+    TWENTY,TWENTY,TWENTY,TWENTY,TWENTY,
+    FIVE,FIVE,
+    PAST,PAST,PAST,
+    TO,
+    H_ONE,H_ONE,H_ONE,
+    HALF,HALF,HALF,HALF,
+    QUARTER,QUARTER,QUARTER,QUARTER,QUARTER,
+    TEN,TEN,
+    IS,IS,
+    IT,IT
+};
+
+typedef struct {
+    int *map;
+    int size;
+} led_map_t;
 
 
 
 
+
+
+
+bool current_leds[NUM_LEDS];
 
 void setup()  {
   Serial.begin(9600);
@@ -107,11 +157,13 @@ void setup()  {
   FastLED.setBrightness(BRIGHTNESS);
 
   Serial.println("T1479235073");
+  Serial.println("T1483306200");
   Serial.println("Waiting for sync message");
+  setTime(1483306200); // Sync Arduino clock to the time received on the serial port
 }
 
-unsigned long lastDisplayTime = 0;
-unsigned long lastLedTime = 0;
+long lastDisplayTime = -100000;
+long lastLedTime = -100000;
 
 void loop(){    
   if (Serial.available() > 1) { // wait for at least two characters
@@ -124,7 +176,7 @@ void loop(){
     }
   }
   if (timeStatus()!= timeNotSet) {
-      if (millis() - lastDisplayTime > 10000) {
+      if (millis() - lastDisplayTime > 1000) {
           digitalClockDisplay();  
           lastDisplayTime = millis();
       }
@@ -133,8 +185,14 @@ void loop(){
   readModeButton();
   handleRotation();
 
-  leds[0] = CHSV(hue, saturation, value);
   if (millis() - lastLedTime > 1000/FRAMES_PER_SECOND) {
+      for (int i = 0; i < NUM_LEDS; i++) {
+          if (current_leds[i]) {
+              leds[i] = fadeTowardColor(leds[i], CHSV(hue, saturation, value), FADE_RATE);
+          } else {
+              leds[i].fadeToBlackBy(FADE_RATE);
+          }
+      }
       FastLED.show();
       lastLedTime = millis();
   }
@@ -325,6 +383,12 @@ void time_to_words(bool *words, int hour, int minute)
     }
 }
 
+void words_to_leds(led_map_t led_map, bool *leds, bool *words)
+{
+    for (int i = 0; i < led_map.size; i++) {
+        leds[i] = words[led_map.map[i]];
+    }
+}
 
 
 
@@ -394,6 +458,12 @@ void digitalClockDisplay() {
   if (words[TO2]) { Serial.print("to "); }
   if (words[SLEEP]) { Serial.print("sleep"); }
   Serial.println(".");
+
+  led_map_t my_map;
+  my_map.map = led_map;
+  my_map.size = sizeof(led_map) / sizeof(led_map[0]);
+
+  words_to_leds(my_map, current_leds, words);
 }
 
 void printDigits(int digits) {
@@ -429,4 +499,47 @@ void processSyncMessage() {
 time_t requestSync() {
   Serial.write(TIME_REQUEST);  
   return 0; // the time will be sent later in response to serial mesg
+}
+
+
+
+
+
+
+
+
+// Helper function that blends one uint8_t toward another by a given amount
+void nblendU8TowardU8( uint8_t& cur, const uint8_t target, uint8_t amount)
+{
+  if( cur == target) return;
+  
+  if( cur < target ) {
+    uint8_t delta = target - cur;
+    delta = scale8_video( delta, amount);
+    cur += delta;
+  } else {
+    uint8_t delta = cur - target;
+    delta = scale8_video( delta, amount);
+    cur -= delta;
+  }
+}
+
+// Blend one CRGB color toward another CRGB color by a given amount.
+// Blending is linear, and done in the RGB color space.
+// This function modifies 'cur' in place.
+CRGB fadeTowardColor( CRGB& cur, const CRGB& target, uint8_t amount)
+{
+  nblendU8TowardU8( cur.red,   target.red,   amount);
+  nblendU8TowardU8( cur.green, target.green, amount);
+  nblendU8TowardU8( cur.blue,  target.blue,  amount);
+  return cur;
+}
+
+// Fade an entire array of CRGBs toward a given background color by a given amount
+// This function modifies the pixel array in place.
+void fadeTowardColor( CRGB* L, uint16_t N, const CRGB& bgColor, uint8_t fadeAmount)
+{
+  for( uint16_t i = 0; i < N; i++) {
+    fadeTowardColor( L[i], bgColor, fadeAmount);
+  }
 }
