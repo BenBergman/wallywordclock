@@ -16,6 +16,9 @@
  */ 
  
 #include <TimeLib.h>
+#include <Wire.h>
+#include <DS1307RTC.h>
+
 
 // single character message tags
 #define TIME_HEADER   'T'   // Header tag for serial time sync message
@@ -148,7 +151,13 @@ bool current_leds[NUM_LEDS];
 void setup()  {
   Serial.begin(9600);
   while (!Serial) ; // Needed for Leonardo only
-  setSyncProvider( requestSync);  //set function to call when sync required
+  setSyncProvider(RTC.get);  //set function to call when sync required
+
+  if (timeStatus() != timeSet) {
+    Serial.println("Unable to sync with the RTC");
+  } else {
+    Serial.println("RTC has set the system time");
+  }
 
   pinMode(BUTTON_PIN, INPUT);
   digitalWrite(BUTTON_PIN, HIGH);
@@ -159,7 +168,6 @@ void setup()  {
   Serial.println("T1479235073");
   Serial.println("T1483306200");
   Serial.println("Waiting for sync message");
-  setTime(1483306200); // Sync Arduino clock to the time received on the serial port
 }
 
 long lastDisplayTime = -100000;
@@ -271,7 +279,8 @@ void handleRotation()
                     } else if (old_day > day()) {
                         adjustTime(SECS_PER_DAY);
                     }
-                    // TODO: store time in RTC
+
+		    RTC.set(now());
                     // TODO: don't let time roll over into next day
                     break;
                 case SET_HUE:
@@ -492,6 +501,7 @@ void processSyncMessage() {
 
    pctime = Serial.parseInt();
    if( pctime >= DEFAULT_TIME) { // check the integer is a valid time (greater than Jan 1 2013)
+     RTC.set(pctime);
      setTime(pctime); // Sync Arduino clock to the time received on the serial port
    }
 }
