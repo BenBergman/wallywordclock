@@ -181,6 +181,7 @@ void setup()  {
 
 long lastDisplayTime = -100000;
 long lastLedTime = -100000;
+time_t lastActivity = 0;
 
 void loop(){    
   if (Serial.available() > 1) { // wait for at least two characters
@@ -202,6 +203,10 @@ void loop(){
   readModeButton();
   handleRotation();
 
+  if (now() - lastActivity > 30) {
+      mode = DISPLAY_MODE;
+  }
+
   if (millis() - lastLedTime > 1000/FRAMES_PER_SECOND) {
       for (int i = 0; i < NUM_LEDS; i++) {
           if (led_map[i] == DOT) {
@@ -212,7 +217,7 @@ void loop(){
 	      }
               switch (mode) {
                   case DISPLAY_MODE:
-                      leds[i].fadeToBlackBy(FADE_RATE);
+                      leds[i] = 0x000000;
                       break;
                   case SET_TIME:
                       leds[i] = (second() % 2) * 0xFFFFFF;
@@ -247,7 +252,6 @@ void loop(){
 
 
 
-
 void readModeButton()
 {
     int btn_reading = digitalRead(BUTTON_PIN);
@@ -260,6 +264,7 @@ void readModeButton()
             buttonState = btn_reading;
 
             if (buttonState == HIGH) {
+	        lastActivity = now();
                 mode = (mode + 1) % TOTAL_MODES;
                 switch (mode) {
                     case DISPLAY_MODE:
@@ -292,6 +297,7 @@ void handleRotation()
 {
     long newPosition = myEnc.read();
     if (newPosition != oldPosition) {
+        lastActivity = now();
         change += (newPosition - oldPosition);
         while (change >= 4 || change <= -4) {
             int step = change / abs(change);
