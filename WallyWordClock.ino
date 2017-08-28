@@ -430,7 +430,11 @@ void digitalClockDisplay() {
 
   bool words[TOTAL_WORDS] = { false };
   time_to_words(words, hour(), minute());
-  
+
+  if (month() == 8 && day() == 26 || (month() == 9 && day() == 2 && year() == 2017)) {
+    words[HAPPY] = words[BIRTHDAY] = true;
+  }
+
   if (words[IT]) { Serial.print("It "); }
   if (words[IS]) { Serial.print("is "); }
   if (words[TWENTY]) { Serial.print("twenty "); }
