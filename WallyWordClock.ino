@@ -45,7 +45,16 @@ int lastButtonState = HIGH;
 unsigned long lastDebounceTime = -1;
 unsigned long debounceDelay = 50;
 
-int mode = 0;
+typedef enum Mode {
+    DISPLAY_MODE,
+    SET_TIME,
+    SET_HUE,
+    SET_SATURATION,
+    SET_BRIGHTNESS,
+    TOTAL_MODES,
+} Mode;
+
+Mode mode = DISPLAY_MODE;
 
 
 
@@ -195,10 +204,39 @@ void loop(){
 
   if (millis() - lastLedTime > 1000/FRAMES_PER_SECOND) {
       for (int i = 0; i < NUM_LEDS; i++) {
-          if (current_leds[i]) {
-              leds[i] = fadeTowardColor(leds[i], CHSV(hue, saturation, value), FADE_RATE);
-          } else {
-              leds[i].fadeToBlackBy(FADE_RATE);
+          if (led_map[i] == DOT) {
+	      unsigned long time = millis();
+	      int pos = (time / 5) % 512;
+	      if (pos >= 256) {
+	          pos = 511 - pos;
+	      }
+              switch (mode) {
+                  case DISPLAY_MODE:
+                      leds[i].fadeToBlackBy(FADE_RATE);
+                      break;
+                  case SET_TIME:
+                      leds[i] = (second() % 2) * 0xFFFFFF;
+                      break;
+                  case SET_HUE:
+                      leds[i].setHSV((millis() / 8) % 256, 255, 255);
+                      break;
+                  case SET_SATURATION:
+                      leds[i].setHSV(255, pos, 255);
+                      break;
+                  case SET_BRIGHTNESS:
+                      leds[i].setHSV(255, 0, pos);
+                      break;
+              }
+	  } else {
+              if (current_leds[i]) {
+                  uint8_t h = hue;
+                  if (led_map[i] == HAPPY || led_map[i] == BIRTHDAY) {
+                      h = h + 128;
+                  }
+                  leds[i] = fadeTowardColor(leds[i], CHSV(h, saturation, value), FADE_RATE);
+              } else {
+                  leds[i].fadeToBlackBy(FADE_RATE);
+              }
           }
       }
       FastLED.show();
@@ -209,15 +247,6 @@ void loop(){
 
 
 
-
-enum {
-    DISPLAY_MODE,
-    SET_TIME,
-    SET_HUE,
-    SET_SATURATION,
-    SET_BRIGHTNESS,
-    TOTAL_MODES,
-};
 
 void readModeButton()
 {
@@ -431,7 +460,7 @@ void digitalClockDisplay() {
   bool words[TOTAL_WORDS] = { false };
   time_to_words(words, hour(), minute());
 
-  if (month() == 8 && day() == 26 || (month() == 9 && day() == 2 && year() == 2017)) {
+  if (month() == 8 && day() == 26 || ((month() < 9 || month() == 9 && day() <= 2) && year() == 2017)) {
     words[HAPPY] = words[BIRTHDAY] = true;
   }
 
