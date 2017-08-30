@@ -18,6 +18,7 @@
 #include <TimeLib.h>
 #include <Wire.h>
 #include <DS1307RTC.h>
+#include <EEPROM.h>
 
 
 // single character message tags
@@ -177,6 +178,13 @@ void setup()  {
   Serial.println("T1479235073");
   Serial.println("T1483306200");
   Serial.println("Waiting for sync message");
+
+  int address = 0;
+  EEPROM.get(address, hue);
+  address += sizeof(hue);
+  EEPROM.get(address, saturation);
+  address += sizeof(saturation);
+  EEPROM.get(address, value);
 }
 
 long lastDisplayTime = -100000;
@@ -205,6 +213,13 @@ void loop(){
 
   if (now() - lastActivity > 30) {
       mode = DISPLAY_MODE;
+
+      int address = 0;
+      EEPROM.put(address, hue);
+      address += sizeof(hue);
+      EEPROM.put(address, saturation);
+      address += sizeof(saturation);
+      EEPROM.put(address, value);
   }
 
   if (millis() - lastLedTime > 1000/FRAMES_PER_SECOND) {
