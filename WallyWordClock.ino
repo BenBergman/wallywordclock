@@ -331,6 +331,7 @@ void handleRotation()
                     }
 
 		    RTC.set(now());
+                    lastActivity = now();
                     // TODO: don't let time roll over into next day
                     break;
                 case SET_HUE:
