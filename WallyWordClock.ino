@@ -520,7 +520,8 @@ void digitalClockDisplay() {
   if (words[GO]) { Serial.print("go "); }
   if (words[TO2]) { Serial.print("to "); }
   if (words[SLEEP]) { Serial.print("sleep"); }
-  Serial.println(".");
+  if (words[DOT]) { Serial.print("."); }
+  Serial.println("");
 
   led_map_t my_map;
   my_map.map = led_map;
