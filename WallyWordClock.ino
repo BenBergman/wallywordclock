@@ -159,6 +159,8 @@ typedef struct {
 bool current_leds[NUM_LEDS];
 
 void setup()  {
+  delay(1000); // Power-up safety delay (copied from FastLED examples)
+
   Serial.begin(9600);
   while (!Serial) ; // Needed for Leonardo only
   setSyncProvider(RTC.get);  //set function to call when sync required
@@ -174,6 +176,8 @@ void setup()  {
 
   FastLED.addLeds<LED_TYPE, LED_DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip); // TODO: should this correction be changed when we have the final strip?
   FastLED.setBrightness(BRIGHTNESS);
+  set_max_power_in_volts_and_milliamps(5, 450);
+  set_max_power_indicator_LED(13);
 
   Serial.println("T1479235073");
   Serial.println("T1483306200");
@@ -482,7 +486,7 @@ void digitalClockDisplay() {
   bool words[TOTAL_WORDS] = { false };
   time_to_words(words, hour(), minute());
 
-  if (month() == 8 && day() == 26 || ((month() < 9 || month() == 9 && day() <= 2) && year() == 2017)) {
+  if (month() == 8 && day() == 26 || ((month() < 10 || month() == 10 && day() <= 7) && year() == 2017)) {
     words[HAPPY] = words[BIRTHDAY] = true;
   }
 
