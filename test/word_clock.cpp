@@ -102,6 +102,26 @@ TEST(WordClock, TenToNoonOclock)
     MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
 }
 
+TEST(WordClock, TwentyOneToOnePM)
+{
+    bool words[TOTAL_WORDS] = { false };
+    time_to_words(words, 12, 39);
+
+    bool expected_words[TOTAL_WORDS] = { false };
+    expected_words[IT] = true;
+    expected_words[IS] = true;
+    expected_words[FIVE] = true;
+    expected_words[TWENTY] = true;
+    expected_words[TO] = true;
+    expected_words[H_ONE] = true;
+    expected_words[PM] = true;
+    expected_words[IN] = true;
+    expected_words[THE] = true;
+    expected_words[AFTERNOON] = true;
+
+    MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
+}
+
 TEST(WordClock, FivePastMidnight)
 {
     bool words[TOTAL_WORDS] = { false };

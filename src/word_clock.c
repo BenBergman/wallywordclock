@@ -48,7 +48,11 @@ void time_to_words(bool *words, int hour, int minute)
         words[TO] = true;
     }
     if (words[TO]) {
-        hour_word += 1;
+        if (hour_word == NOON) {
+            hour_word = H_ONE;
+        } else {
+            hour_word += 1;
+        }
     }
     if (hour_word == NOON && hour != 23) {
         words[NOON] = true;
