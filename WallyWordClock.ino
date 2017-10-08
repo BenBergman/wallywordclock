@@ -486,7 +486,7 @@ void digitalClockDisplay() {
   bool words[TOTAL_WORDS] = { false };
   time_to_words(words, hour(), minute());
 
-  if (month() == 8 && day() == 26 || ((month() < 10 || month() == 10 && day() <= 7) && year() == 2017)) {
+  if (month() == 8 && day() == 26 || ((month() < 10 || month() == 10 && day() <= 9) && year() == 2017)) {
     words[HAPPY] = words[BIRTHDAY] = true;
   }
 
