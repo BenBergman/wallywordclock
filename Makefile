@@ -27,5 +27,8 @@ INCLUDE_DIRS =\
 	$(CPPUTEST_HOME)/include\
 	$(CPPUTEST_HOME)/cpputest_build/lib\
 
+# I had to mess with the warning flags due to how they are processed on macOS
+#CPPUTEST_WARNINGFLAGS =  -Wextra -Wshadow -Wswitch-default -Wswitch-enum -Wconversion -Wno-long-long
+
 include $(CPPUTEST_HOME)/build/MakefileWorker.mk
 

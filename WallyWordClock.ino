@@ -284,7 +284,7 @@ void readModeButton()
 
             if (buttonState == HIGH) {
 	        lastActivity = now();
-                mode = (mode + 1) % TOTAL_MODES;
+                mode = (Mode)((mode + 1) % TOTAL_MODES);
                 switch (mode) {
                     case DISPLAY_MODE:
                         Serial.println("Display mode");
