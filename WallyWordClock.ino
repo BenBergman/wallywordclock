@@ -255,7 +255,9 @@ void loop(){
               if (current_leds[i]) {
                   uint8_t h = hue;
                   if (led_map[i] == HAPPY || led_map[i] == BIRTHDAY) {
-                      h = h + 128;
+                      h = h + 85;
+                  } else if (led_map[i] == GO || led_map[i] == TO2 || led_map[i] == SLEEP) {
+                      h = h + 170;
                   }
                   leds[i] = fadeTowardColor(leds[i], CHSV(h, saturation, value), FADE_RATE);
               } else {
@@ -492,6 +494,10 @@ void digitalClockDisplay() {
 
   if (month() == 8 && day() == 26 || ((month() < 10 || month() == 10 && day() <= 9) && year() == 2017)) {
     words[HAPPY] = words[BIRTHDAY] = true;
+  }
+
+  if (hour() < 7) {
+    words[GO] = words[TO2] = words[SLEEP] = true;
   }
 
   if (words[IT]) { Serial.print("It "); }
