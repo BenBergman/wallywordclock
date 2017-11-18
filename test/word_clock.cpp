@@ -122,6 +122,20 @@ TEST(WordClock, TwentyOneToOnePM)
     MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
 }
 
+TEST(WordClock, Midnight)
+{
+    bool words[TOTAL_WORDS] = { false };
+    time_to_words(words, 0, 1);
+
+    bool expected_words[TOTAL_WORDS] = { false };
+    expected_words[IT] = true;
+    expected_words[IS] = true;
+    expected_words[MIDNIGHT] = true;
+    expected_words[OCLOCK] = true;
+
+    MEMCMP_EQUAL(expected_words, words, sizeof(expected_words));
+}
+
 TEST(WordClock, FivePastMidnight)
 {
     bool words[TOTAL_WORDS] = { false };
