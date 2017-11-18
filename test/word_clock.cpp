@@ -239,6 +239,9 @@ TEST(WordClock, BasicWordsToLedsConversion)
     words_to_leds(my_map, leds, words);
 
     bool *expected_leds = new bool[my_map.size];
+    for (int i = 0; i < my_map.size; i++) {
+        expected_leds[i] = false;
+    }
     expected_leds[0] = expected_leds[1] = true;
     expected_leds[4] = true;
     expected_leds[8] = true;
